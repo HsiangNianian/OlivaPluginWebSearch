@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>  
+  <head>
+    <title>Github Tag Packages</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <style>
+      body {margin:0;}
+      .content {
+        max-width: 78%!;(string=2022-12-19 00:47:55)
+        margin: 0 auto;
+      }
+      .list-item {
+        padding: 10px;
+        list-style-type: none;
+      }
+      .button {
+        padding: 10px;
+        border-radius: 5px;
+        color: #fff;
+        background: #009688;
+      }
+    </style>
+  </head>
+  <body>
+  	<div class="content">
+  		<h3>Github Tag Packages</h3>
+  		<div id="tag-data">
+  			<!-- List of packages with tag name -->
+  			<ul id="list-data">
+                <li>olivos</li>
+  			</ul>
+  		</div>
+  		<button class="button" id="loadMore">Load More</button>
+  	</div>
+  
+    <script>
+      // Set the Tag name here.
+      const tagName = 'olivos';
+  
+      let page = 1;
+      let gapiUrl = `https://api.github.com/search/repositories?q=topic:${tagName}&page=${page}&per_page=6&sort=stars`;
+  
+      // Get data from github
+      const getData = (url, cb) => {
+        $.ajax({
+          url: url,
+          success: (data) => {
+            cb && cb(null, data)
+          },
+          error: (err) => {
+            cb && cb(err)
+          }
+        });
+      };
+  
+      // Render data to html
+      const renderData = (data) => {
+        let elements = '';
+        data.items.forEach(element => {
+          elements += `<li class="list-item">
+                        <h4> <a href="${element.html_url}"> ${element.full_name} </a> </h4>
+                        <p> Stars: ${element.stargazers_count} </p>
+                        </li>`;
+        });
+        $('#list-data').append(elements);
+        page++;
+        gapiUrl = `https://api.github.com/search/repositories?q=topic:${tagName}&page=${page}&per_page=6&sort=stars`;
+      };
+  
+      // Load more button
+      $('#loadMore').click(function () {
+        getData(gapiUrl, (err, data) => {
+          if (err) {
+            alert('Something went wrong!');
+          } else {
+            renderData(data);
+          }
+        });
+      })
+  
+      // load first page data
+      getData(gapiUrl, (err, data) => {
+        if (err) {
+          alert('Something went wrong!');
+        } else {
+          renderData(data);
+        }
+      });
+    </script>
+  </body>
+</html>
